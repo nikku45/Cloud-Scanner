@@ -1,8 +1,3 @@
-/**
- * Scan Service
- * Orchestrates security scanning across all AWS services
- * Manages scan history and provides summary calculations
- */
 
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -16,18 +11,14 @@ import { scanS3Buckets } from "../scanners/s3Scanner";
 import { scanEC2 } from "../scanners/ec2Scanner";
 import { scanIAM } from "../scanners/iamScanner";
 import { scanRDS } from "../scanners/rdsScanner";
+// import { saveScanResult } from "../storage/dynamodb";
 
-/**
- * Generate a unique ID for each scan
- */
+
 function generateScanId(): string {
     return `scan-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
 
-/**
- * In-memory storage for scan results
- * In production, this would be a database
- */
+
 const scanHistory: ScanResult[] = [];
 
 /**
@@ -146,6 +137,7 @@ export async function runFullScan(): Promise<ScanResult> {
     }
 
     // Store in history (keep only last N scans)
+    // saveScanResult(scanResult)
     scanHistory.unshift(scanResult);
     if (scanHistory.length > MAX_SCAN_HISTORY) {
         scanHistory.pop();
@@ -158,6 +150,7 @@ export async function runFullScan(): Promise<ScanResult> {
  * Get the latest scan result
  */
 export function getLatestScan(): ScanResult | null {
+
     return scanHistory.length > 0 ? scanHistory[0] : null;
 }
 
