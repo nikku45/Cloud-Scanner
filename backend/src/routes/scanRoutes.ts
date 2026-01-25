@@ -7,9 +7,7 @@ import { Router, Request, Response } from "express";
 import {
     runFullScan,
     getLatestScan,
-    getScanHistory,
     getLatestSummary,
-    getScanById
 } from "../services/scanService";
 
 const router = Router();
@@ -44,9 +42,9 @@ router.post("/scan", async (req: Request, res: Response) => {
  * GET /api/results
  * Get the latest scan results
  */
-router.get("/results", (req: Request, res: Response) => {
+router.get("/results", async (req: Request, res: Response) => {
     try {
-        const result = getLatestScan();
+        const result = await getLatestScan();
 
         if (!result) {
             return res.status(404).json({
@@ -73,92 +71,92 @@ router.get("/results", (req: Request, res: Response) => {
  * GET /api/results/:scanId
  * Get results for a specific scan
  */
-router.get("/results/:scanId", (req: Request, res: Response) => {
-    try {
-        const { scanId } = req.params;
-        const result = getScanById(scanId);
+// router.get("/results/:scanId", (req: Request, res: Response) => {
+//     try {
+//         const { scanId } = req.params;
+//         const result = getScanById(scanId);
 
-        if (!result) {
-            return res.status(404).json({
-                success: false,
-                message: `Scan ${scanId} not found`
-            });
-        }
+//         if (!result) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: `Scan ${scanId} not found`
+//             });
+//         }
 
-        res.status(200).json({
-            success: true,
-            data: result
-        });
-    } catch (error) {
-        console.error("Results API error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to get scan results",
-            error: String(error)
-        });
-    }
-});
+//         res.status(200).json({
+//             success: true,
+//             data: result
+//         });
+//     } catch (error) {
+//         console.error("Results API error:", error);
+//         res.status(500).json({
+//             success: false,
+//             message: "Failed to get scan results",
+//             error: String(error)
+//         });
+//     }
+// });
 
 /**
  * GET /api/summary
  * Get summary of the latest scan
  */
-router.get("/summary", (req: Request, res: Response) => {
-    try {
-        const summary = getLatestSummary();
+// router.get("/summary", async (req: Request, res: Response) => {
+//     try {
+//         const summary = await getLatestSummary();
 
-        if (!summary) {
-            return res.status(404).json({
-                success: false,
-                message: "No scan summary found. Run a scan first."
-            });
-        }
+//         if (!summary) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: "No scan summary found. Run a scan first."
+//             });
+//         }
 
-        res.status(200).json({
-            success: true,
-            data: summary
-        });
-    } catch (error) {
-        console.error("Summary API error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to get scan summary",
-            error: String(error)
-        });
-    }
-});
+//         res.status(200).json({
+//             success: true,
+//             data: summary
+//         });
+//     } catch (error) {
+//         console.error("Summary API error:", error);
+//         res.status(500).json({
+//             success: false,
+//             message: "Failed to get scan summary",
+//             error: String(error)
+//         });
+//     }
+// });
 
 /**
  * GET /api/history
  * Get scan history
  */
-router.get("/history", (req: Request, res: Response) => {
-    try {
-        const history = getScanHistory();
+// router.get("/history", (req: Request, res: Response) => {
+//     try {
+//         const history = getScanHistory();
 
-        // Return simplified history (without full findings for performance)
-        const simplifiedHistory = history.map(scan => ({
-            id: scan.id,
-            summary: scan.summary,
-            startTime: scan.startTime,
-            endTime: scan.endTime,
-            status: scan.status,
-            findingsCount: scan.findings.length
-        }));
+//         // Return simplified history (without full findings for performance)
+//         const simplifiedHistory = history.map(scan => ({
+//             scanId: scan.scanId,
+//             summary: scan.summary,
+//             startTime: scan.startTime,
+//             endTime: scan.endTime,
+//             status: scan.status,
+//             findingsCount: scan.findings.length
+//         }));
 
-        res.status(200).json({
-            success: true,
-            data: simplifiedHistory
-        });
-    } catch (error) {
-        console.error("History API error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to get scan history",
-            error: String(error)
-        });
-    }
-});
+//         res.status(200).json({
+//             success: true,
+//             data: simplifiedHistory
+//         });
+//     } catch (error) {
+//         console.error("History API error:", error);
+//         res.status(500).json({
+//             success: false,
+//             message: "Failed to get scan history",
+//             error: String(error)
+//         });
+//     }
+// });
 
 /**
  * GET /api/health

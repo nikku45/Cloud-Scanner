@@ -11,7 +11,7 @@ import { scanS3Buckets } from "../scanners/s3Scanner";
 import { scanEC2 } from "../scanners/ec2Scanner";
 import { scanIAM } from "../scanners/iamScanner";
 import { scanRDS } from "../scanners/rdsScanner";
-// import { saveScanResult } from "../storage/dynamodb";
+import { saveScanResult, getLatestScanResult } from "../storage/dynamodb";
 
 
 function generateScanId(): string {
@@ -19,16 +19,14 @@ function generateScanId(): string {
 }
 
 
-const scanHistory: ScanResult[] = [];
+// const scanHistory: ScanResult[] = [];
 
 /**
  * Maximum number of scans to keep in history
  */
-const MAX_SCAN_HISTORY = 100;
+// const MAX_SCAN_HISTORY = 100;
 
-/**
- * Calculate summary statistics from findings
- */
+
 function calculateSummary(findings: SecurityFinding[]): ScanSummary {
     const passed = findings.filter(f => f.status === CheckStatus.PASS).length;
     const failed = findings.filter(f => f.status === CheckStatus.FAIL).length;
@@ -63,7 +61,7 @@ export async function runFullScan(): Promise<ScanResult> {
 
     // Create initial scan result
     const scanResult: ScanResult = {
-        id: scanId,
+        scanId: scanId,
         summary: {
             totalResources: 0,
             passed: 0,
@@ -113,7 +111,7 @@ export async function runFullScan(): Promise<ScanResult> {
             finding.timestamp = timestamp;
         });
 
-        // Calculate summary
+        // Calculates summary
         const summary = calculateSummary(allFindings);
 
         // Update scan result
@@ -137,11 +135,11 @@ export async function runFullScan(): Promise<ScanResult> {
     }
 
     // Store in history (keep only last N scans)
-    // saveScanResult(scanResult)
-    scanHistory.unshift(scanResult);
-    if (scanHistory.length > MAX_SCAN_HISTORY) {
-        scanHistory.pop();
-    }
+    saveScanResult(scanResult)
+    // scanHistory.unshift(scanResult);
+    // if (scanHistory.length > MAX_SCAN_HISTORY) {
+    //     scanHistory.pop();
+    // }
 
     return scanResult;
 }
@@ -149,36 +147,39 @@ export async function runFullScan(): Promise<ScanResult> {
 /**
  * Get the latest scan result
  */
-export function getLatestScan(): ScanResult | null {
-
-    return scanHistory.length > 0 ? scanHistory[0] : null;
+export async function getLatestScan(): Promise<ScanResult | null> {
+    const latestScanResult = await getLatestScanResult();
+    if (!latestScanResult) {
+        return null;
+    }
+    return latestScanResult;
 }
 
 /**
  * Get all scan history
  */
-export function getScanHistory(): ScanResult[] {
-    return scanHistory;
-}
+// export function getScanHistory(): ScanResult[] {
+//     return scanHistory;
+// }
 
 /**
  * Get a specific scan by ID
  */
-export function getScanById(scanId: string): ScanResult | undefined {
-    return scanHistory.find(scan => scan.id === scanId);
-}
+// export function getScanById(scanId: string): ScanResult | undefined {
+//     return scanHistory.find(scan => scan.scanId === scanId);
+// }
 
 /**
  * Get summary of the latest scan
  */
-export function getLatestSummary(): ScanSummary | null {
-    const latest = getLatestScan();
+export async function getLatestSummary(): Promise<ScanSummary | null> {
+    const latest = await getLatestScan();
     return latest ? latest.summary : null;
 }
 
 /**
  * Clear scan history (useful for testing)
  */
-export function clearHistory(): void {
-    scanHistory.length = 0;
-}
+// export function clearHistory(): void {
+//     scanHistory.length = 0;
+// }

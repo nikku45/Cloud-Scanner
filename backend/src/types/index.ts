@@ -59,7 +59,7 @@ export interface ScanSummary {
  * Complete scan result with findings and summary
  */
 export interface ScanResult {
-    id: string;
+    scanId: string;
     summary: ScanSummary;
     findings: SecurityFinding[];
     startTime: Date;
