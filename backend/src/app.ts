@@ -9,7 +9,7 @@ const app: Application = express();
 
 // Enable CORS for frontend access
 app.use(cors({
-    origin: ["http://localhost:5173", "https://cloud-scanner.vercel.app/"],
+    origin: ["http://localhost:5173", "https://cloud-scanner.vercel.app"],
     methods: ["GET", "POST"],
     credentials: true
 }));
