@@ -1,0 +1,143 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.logo-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--accent-gradient);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: var(--shadow-glow);
+}
+
+.logo-text h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.logo-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.025em;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xl);
+}
+
+.status-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--spacing-xs);
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.connection-status.connected .status-dot {
+    background: var(--status-pass);
+    box-shadow: 0 0 8px var(--status-pass);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.connection-status.connected {
+    color: var(--status-pass);
+}
+
+.connection-status.disconnected .status-dot {
+    background: var(--status-fail);
+}
+
+.connection-status.disconnected {
+    color: var(--status-fail);
+}
+
+.last-scan {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.last-scan .label {
+    margin-right: var(--spacing-xs);
+}
+
+.last-scan .time {
+    color: var(--text-secondary);
+}
+
+.scan-btn {
+    min-width: 140px;
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.scan-btn .spinner {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .status-info {
+        align-items: flex-start;
+    }
+
+    .logo-text h1 {
+        font-size: 1rem;
+    }
+}
