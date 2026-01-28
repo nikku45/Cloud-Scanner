@@ -12,8 +12,6 @@ import {
     GetBucketVersioningCommand,
     GetPublicAccessBlockCommand,
     Bucket,
-    PublicAccessBlockConfiguration,
-    ServerSideEncryptionConfiguration
 } from "@aws-sdk/client-s3";
 import { getAWSConfig } from "./config";
 
@@ -66,7 +64,8 @@ export async function getBucketRegion(bucketName: string): Promise<string> {
         const response = await s3Client.send(
             new GetBucketLocationCommand({ Bucket: bucketName })
         );
-        // null or empty means us-east-1
+
+        // console.log("Get bucket region response", response);
         return response.LocationConstraint || "us-east-1";
     } catch (error) {
         console.error(`Error getting region for bucket ${bucketName}:`, error);
@@ -77,10 +76,14 @@ export async function getBucketRegion(bucketName: string): Promise<string> {
 /**
  * Check if bucket has encryption enabled
  */
-export async function getBucketEncryption(bucketName: string): Promise<{
+export async function getBucketEncryption(bucketName: string, region: string): Promise<{
     enabled: boolean;
     type?: string;
 }> {
+    const s3Client = new S3Client({ region });
+    // console.log("========================================================")
+    // console.log("Get bucket encryption response using region client", s3Client);
+    // console.log("========================================================")
     try {
         const response = await s3Client.send(
             new GetBucketEncryptionCommand({ Bucket: bucketName })
@@ -108,10 +111,11 @@ export async function getBucketEncryption(bucketName: string): Promise<{
 /**
  * Check if bucket has versioning enabled
  */
-export async function getBucketVersioning(bucketName: string): Promise<{
+export async function getBucketVersioning(bucketName: string, region: string): Promise<{
     enabled: boolean;
     mfaDelete: boolean;
 }> {
+    const s3Client = new S3Client({ region });
     try {
         const response = await s3Client.send(
             new GetBucketVersioningCommand({ Bucket: bucketName })
@@ -129,13 +133,14 @@ export async function getBucketVersioning(bucketName: string): Promise<{
 /**
  * Check the public access block settings for a bucket
  */
-export async function getPublicAccessBlock(bucketName: string): Promise<{
+export async function getPublicAccessBlock(bucketName: string, region: string): Promise<{
     blockPublicAcls: boolean;
     blockPublicPolicy: boolean;
     ignorePublicAcls: boolean;
     restrictPublicBuckets: boolean;
     isFullyBlocked: boolean;
 }> {
+    const s3Client = new S3Client({ region });
     try {
         const response = await s3Client.send(
             new GetPublicAccessBlockCommand({ Bucket: bucketName })
@@ -161,6 +166,7 @@ export async function getPublicAccessBlock(bucketName: string): Promise<{
     } catch (error: any) {
         // If public access block is not configured, it means public access might be allowed
         if (error.name === "NoSuchPublicAccessBlockConfiguration") {
+            console.log("Public access block not configured for bucket", bucketName, error);
             return {
                 blockPublicAcls: false,
                 blockPublicPolicy: false,
@@ -194,12 +200,13 @@ export async function getAllBucketsInfo(): Promise<S3BucketInfo[]> {
 
         const bucketName = bucket.Name;
 
+        const region = await getBucketRegion(bucketName);
+
         // Fetch all details in parallel for better performance
-        const [region, encryption, versioning, publicAccess] = await Promise.all([
-            getBucketRegion(bucketName),
-            getBucketEncryption(bucketName),
-            getBucketVersioning(bucketName),
-            getPublicAccessBlock(bucketName)
+        const [encryption, versioning, publicAccess] = await Promise.all([
+            getBucketEncryption(bucketName, region),
+            getBucketVersioning(bucketName, region),
+            getPublicAccessBlock(bucketName, region)
         ]);
 
         bucketsInfo.push({
