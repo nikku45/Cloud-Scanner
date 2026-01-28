@@ -3,7 +3,7 @@ import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { ScanResult, SecurityFinding } from "../types";
 
 // Create DynamoDB client (uses AWS credentials from environment or CLI)
-const ddbClient = new DynamoDBClient({ region: process.env.AWS_REGION || "eu-north-1" });
+const ddbClient = new DynamoDBClient({ region: "eu-north-1" });
 
 // DynamoDB table name
 const TABLE_NAME = "CloudPostureResults";
