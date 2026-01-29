@@ -200,15 +200,6 @@ Create an IAM user/role with these **read-only** permissions:
 }
 ```
 
-## ⚠️ Limitations
-
-
-1. **No Authentication**: The API is open (add auth for production)
-2. **Single Region**: Scans the configured region only
-3. **Rate Limits**: AWS API rate limits may affect large accounts
-4. **No Remediation**: Read-only - doesn't fix issues automatically
-
-
 
 ## 📚 Based On
 
